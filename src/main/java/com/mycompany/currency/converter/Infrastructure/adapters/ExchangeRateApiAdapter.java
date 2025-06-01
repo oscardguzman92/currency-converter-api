@@ -46,10 +46,10 @@ public class ExchangeRateApiAdapter implements ExchangeRateProviderStrategy {
 
             if(!response.isSuccess()) {
                 logger.error("External API indicated failure: {}", response);
-                throw new ExternalApiException("External API indicated an error.")
+                throw new ExternalApiException("External API indicated an error.");
             }
 
-            if (response != null && response.getRates() != null && !response.getRates().isEmpty()) {
+            if (response.getRates() != null && !response.getRates().isEmpty()) {
                 logger.debug("Successfully fetched rates. Date: {}, Rates count: {}", response.getDate(), response.getRates().size());
                 return response.getRates();
             } else {
@@ -62,7 +62,7 @@ public class ExchangeRateApiAdapter implements ExchangeRateProviderStrategy {
 
         } catch (Exception e) {
             logger.error("Error fetching exchange rates from external API: {}",e.getMessage());
-            throw new RuntimeException("An unxpected error occurred while processing external API response.", e);
+            throw new RuntimeException("An unexpected error occurred while processing external API response.", e);
         }
     }
 }
