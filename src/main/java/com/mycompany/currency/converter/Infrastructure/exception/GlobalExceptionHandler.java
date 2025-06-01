@@ -15,6 +15,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    // Handles validation errors (e.g., @NotBlank, @DecimalMin)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -25,8 +26,9 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
+    //Handles cases where a currency is not found or supported
     @ExceptionHandler(CurrencyNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NOT_FOUND)   //404 Not Found for resource (currency) not found
     public Map<String, String> handleCurrencyNotFoundException(CurrencyNotFoundException ex) {
         logger.error("Currency not found error: {}", ex.getMessage());
         Map<String, String> error = new HashMap<>();
@@ -34,8 +36,9 @@ public class GlobalExceptionHandler {
         return error;
     }
 
+    //Handles errors from the external API or unexpected service issues
     @ExceptionHandler(ExternalApiException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE) //503 Service Unavailable for external dependency issues
     public Map<String, String> handleExternalApiException(ExternalApiException ex) {
         logger.error("External API error: {}", ex.getMessage());
         Map<String, String> error = new HashMap<>();
@@ -43,8 +46,9 @@ public class GlobalExceptionHandler {
         return error;
     }
 
+    //Generic error handler for any other unexpected exceptions
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) //500 Internal Server Error
     public Map<String, String> handleGenericException(Exception ex) {
         logger.error("An unexpected internal error occurred: {}", ex.getMessage(), ex);
         Map<String, String> error = new HashMap<>();
