@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CurrencyNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)   //404 Not Found for resource (currency) not found
     public Map<String, String> handleCurrencyNotFoundException(CurrencyNotFoundException ex) {
-        logger.error("Currency not found error: {}", ex.getMessage());
+        logger.error("Currency not found error: {}", ex.getMessage(), ex);
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return error;
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalApiException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE) //503 Service Unavailable for external dependency issues
     public Map<String, String> handleExternalApiException(ExternalApiException ex) {
-        logger.error("External API error: {}", ex.getMessage());
+        logger.error("External API error: {}", ex.getMessage(), ex);
         Map<String, String> error = new HashMap<>();
         error.put("error", "An issue occurred with the external exchange rate service. Please try again later.");
         return error;
