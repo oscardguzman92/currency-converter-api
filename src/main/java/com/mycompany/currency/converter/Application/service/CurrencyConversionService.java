@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Map;
@@ -65,14 +66,28 @@ public class CurrencyConversionService {
                 throw new CurrencyNotFoundException("Target currency not supported: " + targetCurrency);
             }
 
-            // Ensure EUR is also present in rates as 1.0 (for consistency in calculations)
-            ratesInEuro.putIfAbsent(BASE_CURRENCY_FOR_API, BigDecimal.valueOf(1.0));
+            // Asegurar que la moneda base EUR está presente en los rates 1.0 (para consistencia en los cálculos)
+            ratesInEuro.putIfAbsent(BASE_CURRENCY_FOR_API, BigDecimal.ONE);
 
             // 3. Perform the conversion: Source -> EUR -> Target
             // Get rate for 1 EUR = X SourceCurrency
-            BigDecimal rateSourceToEuro = ratesInEuro.get(sourceCurrency);
+            BigDecimal rateSourceToEuro;
+            if (sourceCurrency.equalsIgnoreCase(BASE_CURRENCY_FOR_API)) {
+                rateSourceToEuro = BigDecimal.ONE;
+            } else if (ratesInEuro.containsKey(sourceCurrency)) {
+                rateSourceToEuro = ratesInEuro.get(sourceCurrency);
+            } else {
+                throw new CurrencyNotFoundException("Source currency not supported: " + sourceCurrency);
+            }
             // Get rate for 1 EUR = X TargetCurrency
-            BigDecimal rateTargetToEuro = ratesInEuro.get(targetCurrency);
+            BigDecimal rateTargetToEuro;
+            if (targetCurrency.equalsIgnoreCase(BASE_CURRENCY_FOR_API)) {
+                rateTargetToEuro = BigDecimal.ONE;
+            } else if (ratesInEuro.containsKey(targetCurrency)) {
+                rateTargetToEuro = ratesInEuro.get(targetCurrency);
+            } else {
+                throw new CurrencyNotFoundException("Target currency not supported: " + targetCurrency);
+            }
 
             if (rateSourceToEuro == null || rateSourceToEuro.compareTo(BigDecimal.ZERO) <= 0) {
                 logger.error("Invalid or zero rate for source currency: {}", sourceCurrency);
@@ -86,25 +101,25 @@ public class CurrencyConversionService {
             // Convert original amount from SourceCurrency to EUR
             // If 1 EUR = X SourceCurrency, then Y SourceCurrency = Y/X EUR
             //amountInEuro = amount / rateSourceToEuro;
-            BigDecimal amountInEuro = amount.divide(rateSourceToEuro, RATE_SCALE, ROUNDING_MODE);
+            BigDecimal amountInEuro = amount.divide(rateSourceToEuro, MathContext.DECIMAL64);
 
             // Convert amount from EUR to TargetCurrency
             // If 1 EUR = Z TargetCurrency, then amountInEuro EUR = amountInEuro * Z TargetCurrency
             //convertedAmount = amountInEuro * rateTargetToEuro;
-            BigDecimal convertedAmount = amountInEuro.multiply(rateTargetToEuro);
+            BigDecimal convertedAmount = amountInEuro.multiply(rateTargetToEuro, MathContext.DECIMAL64);
 
             // 4. Build and return the response using the Builder Pattern
             // The exchange rate presented to the user should be Direct Rate (Source to Target)
-            BigDecimal directExchangeRate = rateTargetToEuro.divide(rateSourceToEuro, RATE_SCALE, ROUNDING_MODE);
+            BigDecimal directExchangeRate = rateTargetToEuro.divide(rateSourceToEuro, MathContext.DECIMAL64);
 
             logger.info("Conversion successful: {} {} to {} {} with rate {}", amount, sourceCurrency, convertedAmount, targetCurrency, directExchangeRate);
             successfulConversionsCounter.increment();
 
             return ConversionResponse.builder()
                     .conversionDate(LocalDate.now())
-                    .exchangeRate(directExchangeRate.setScale(RATE_SCALE, ROUNDING_MODE))
-                    .originalAmount(amount.setScale(CURRENCY_SCALE, ROUNDING_MODE))
-                    .convertedAmount(convertedAmount.setScale(CURRENCY_SCALE, ROUNDING_MODE))
+                    .exchangeRate(directExchangeRate)
+                    .originalAmount(amount)
+                    .convertedAmount(convertedAmount)
                     .sourceCurrency(sourceCurrency)
                     .targetCurrency(targetCurrency)
                     .build();
