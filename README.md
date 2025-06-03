@@ -1,6 +1,7 @@
 # Currency Converter API
-
-¡Bienvenido al proyecto Currency Converter API! Esta es una aplicación Spring Boot que proporciona un servicio de conversión de divisas, implementando principios de Clean Architecture y patrones de diseño para una solución robusta, escalable y mantenible.
+Esta es una aplicación Spring Boot que proporciona un servicio de conversión de divisas, siguiendo principios de 
+Clean Architecture y empleando patrones de diseño para garantizar su mantenibilidad, testabilidad y resiliencia en 
+un entorno de negocio real. 
 
 ## Tabla de Contenidos
 1.  [Descripción General](#1-descripción-general)
@@ -19,60 +20,71 @@
 ---
 
 ### 1. Descripción General
-* La aplicación tiene como propósito realizar un conversor de monedas
-* que funciona consultando en una API externa las tasas de cambio con 
-* base al euro (EUR), con lo que se busca dar una demostración de como 
-* establecer una base sólida para crear un proyecto escalable y mantenible,
-* asegurando así ser adaptable y resiliente a cambios y errores, más cercano 
-* a un escenario con un dominio de negocio real. 
+* Este proyecto tiene como propósito realizar una API de conversión de monedas.
+* Su funcionalidad principal radica en la consulta y procesamiento de tasas de 
+* cambio obtenidas de una API externa (Exchange Rates API), que utiliza el Euro  (EUR),
+* como divisa base. El objetivo es proporcionar una demostración práctica de como establecer 
+* una base sólida para un proyecto de microservicio, enfatizando en la creación de una aplicación
+* escalable,mantenible, adaptable y resiliente frente a cambios y errores, lo que la hace ideal
+* para replicar en un dominio de negocio real. 
 
 ### 2. Características
 * Conversión de divisas (Origen -> EUR -> Destino):
-* Se emplea una lógica de conversión de dos pasos (Origen -> EUR -> Destino) se maneja
-* explícitamente, ya que la API externa proporciona tasas relativas a EUR.
+*  La lógica de conversión se gestiona explícitamente en dos fases (de la moneda origen a EUR, y de EUR a la moneda 
+* destino), optimizando el uso de la API externa que solo proporciona tasas relativas al Euro.
 * 
 * Integración con API externa de tasas de cambio:
-* Realizamos una integración con la API externa de Exchange Rates para obtener las tasas de cambio y posteriormente 
-* hacer el cálculo del cambio a la moneda destino. 
+* Realizar una integración robusta con la API externa de Exchange Rates para obtener las tasas de cambio actualizadas, 
+* que son la base para todos los cálculos de conversión. 
 * 
-* Manejo de errores para monedas no soportadas y fallos de la API externa:
-* Se tiene un manejo personalizado de errores en caso de no encontrar una moneda soportada o si hay algún fallo presente 
-* en la API externa. Adicionalmente, se implementa un manejo de errores centralizado mediante `@RestControllerAdivce` que 
-* permite interceptar todas las excepciones lanzadas por los controladores. 
-* Mecanismo de caché en memoria para tasas de cambio. A través de métodos anotados con @ExceptionHandler, se asignan 
-* respuestas HTTP adecuadas según el tipo de error (400 Bad Request para validación, 404 Not Found para moneda no soportada,
-* 503 Service Unavailable para fallos de la API externa, 500 Internal Server Error para errores inesperados). 
-* Esto proporciona una solución de manejo de errores mucho más limpia escalable y consistente para el API.
+* Manejo centralizado y detallado de errores:
+* Implementa un manejo personalizado de excepciones (`CurrencyNotFoundException`, `ExternalApiException`) para escenarios 
+* específicos como monedas no soportadas o fallos de la API externa.
+* Utiliza un `@RestControllerAdvice` global para centralizar la gestión de errores, interceptando todas las excepciones 
+* lanzadas por los controladores.
+* Asigna respuestas HTTP estandarizadas y significativas según el tipo de error (ej., 400 Bad Request para validación, 
+* 404 Not Found para divisas no soportadas, 503 Service Unavailable para fallos externos, 500 Internal Server Error para 
+* errores inesperados), lo que garantiza una API más limpia, escalable y consistente.
 * 
-* Sistema de notificación de fallos de servicios externos con cooldown.
-* La implementación de la lógica de notificación en LoggingNotificationAdapter es robusta y escalable, pues cuenta con un 
-* mecanismo de ‘cooldown’ de 5 minutos para las alertas. Esto significa que si un servicio externo experimenta fallos continuos, 
-* solo se enviará una notificación inicial y luego se esperara´un período definido antes de enviar otra notificación para 
-* el mismo problema. Esto con el fin de evitar saturar las alertas al equipo de operaciones, permitiéndoles centrarse en 
-* la causa raíz sin ser expuestos a mensajes repetitivos, mejorando así la gestión de incidentes.
-
-Adicionalmente el proceso de notificaciones se ejecuta de forma asíncrona. Esto garantiza que las operaciones de 
-notificación no bloqueen el hilo principal de la aplicación. La aplicación garantiza una experiencia de usuario sin 
-interrupciones ante operaciones secundarias, y permite que el sistema escale eficientemente bajo carga, sin que la capa 
-de presentación se vea afectada por el rendimiento del sistema de notificaciones.
+* Mecanismo de Caché en memoria para tasas de cambio: 
+* Para optimizar el rendimiento y reducir la dependencia de la API externa, las tasas de cambio obtenidas se almacenan 
+* temporalmente en una caché en memoria. 
 * 
+* Sistema de notificación de fallos con Cooldown:
+* La implementación en LoggingNotificationAdapter es robusta y escalable, incorporando un mecanismo de cooldown 
+* de 5 minutos para las alertas. Esto previene la saturación de notificaciones ante fallos continuos de servicios externos, 
+* permitiendo al equipo de operaciones enfocarse en la solución de la causa raíz. 
+* El proceso de notificaciones se ejecuta de forma asíncrona, garantizando que no bloquee el hilo principa de la aplicación 
+* y permitiendo una experiencia de usuario ininterrumpida y una mayor escalabilidad bajo carga.
+*
+* Validación exhaustiva de entradas de la API.
+* Se realiza una validación exhaustiva de las entradas, revisando un rango de entrada  válido para el dato numérico de
+* entrada del monto a convertir, y si las monedas de origen y destino a convertir cumplen con estándar ISO 4217.
+*
 * Testing y pruebas unitarias:
 * Se verifica los casos de éxito (conversión entre euros y otra moneda, y entre dos monedas diferente a euro) y los casos
 * de fallo (moneda no encontrada). 
 * 
-* Métricas de rendimiento con Micrometer (éxitos, fallos, duración de conversión).
-* Las métricas  (Counter y Timer) se incrementan correctamente en los escenarios de éxito y fallo. Utilizando 
-* SimpleMeterRegistry para las pruebas unitarias de métricas, ya que es ligero y no requiere un servidor Prometheus real.
+* Métricas de rendimiento y observabilidad con Micrometer (éxitos, fallos, duración de conversión).
+* Se han implementado contadores para registrar las conversiones exitosas y fallidas, y un temporizador para medir la 
+* duración de las operaciones de conversión.
+* Estas métricas son cruciales para monitorear el rendimiento y la salud de la aplicación en entornos de producción.
+* Para las pruebas unitarias, se utiliza SimpleMeterRegistry, una implementación ligera que no requiere un servidor Prometheus real.
 * 
+* Comunicación Segura (HTTPS): 
+* La aplicación está configurada para servir la API a través de HTTPS, utilizando un certificado auto-firmado, lo que 
+* demuestra la preocupación por la seguridad en la comunicación.
 * 
-* Validación de entradas de la API.
-* Se realiza una validación exhaustiva de las entradas, revisando un rango de entrada  válido para el dato numérico de
-* entrada del monto a convertir, y si las monedas de origen y destino a convertir cumplen con estándar ISO 4217. 
-*  
-* Contenedorización con Docker.
-* Creamos un Dockerfile para poner nuestro microservicio en un contenedor y poder correrlo luego en un ambiente de desarrollo
-* o de producción, y para facilitar su despliegue y pruebas desde cualquier dispositivo sin preocupación de tener que 
-* instalar las dependencias en el ambiente local. Dejamos el access key del API externa definido como variable de entorno, 
+* Monitoreo y Operaciones con Spring Boot Actuator: 
+* Se exponen los endpoints health e info de Spring Boot Actuator, esenciales para verificar el estado de la aplicación, 
+* obtener metadatos y facilitar la integración con herramientas de monitoreo en entornos de producción.
+* 
+* Contenedorización con Docker:
+* Se proporciona un Dockerfile para empaquetar la aplicación en un contenedor aislado, facilitando su despliegue 
+* consistente en cualquier entorno (desarrollo, pruebas, producción) sin preocuparse por las dependencias del sistema 
+* host. Además, se demuestra la gestión segura de las claves API a través de variables de entorno de Docker.
+* 
+* Dejamos el access key del API externa definido como variable de entorno, 
 * y la seteamos desde el llamado de docker run:
 * docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest
 * De esta forma mantenemos los secrets y la información sensible fuera de git y de ser hardcodeado en el código y los 
@@ -81,26 +93,18 @@ de presentación se vea afectada por el rendimiento del sistema de notificacione
 ### 3. Decisiones de Diseño y Arquitectura
 
 * **Arquitectura:** 
-* Se optó por una arquitectura hexagonal (Clean Architecture) 
-* para separar las preocupaciones y facilitar la mantenibilidad 
-* y testabilidad. 
-* Esto se refleja en la estructura de paquetes (Application, 
-* Infrastructure, Presentation, Domain).
-* En cambio, la capa de aplicación actúa como el orquestador principal, utilizando los puertos (ports) y adaptadores 
-* (adapters) de la capa de infraestructura (infrastructure) para obtener las tasas de cambio y realizar el cálculo directamente.
+* Se optó por esta arquitectura para lograr una separación clara de preocupaciones (Application, Infrastructure, 
+* Presentation, Domain), lo que resulta en una aplicación más mantenible, testable y desacoplada. La capa de aplicación 
+* actúa como el orquestador principal, utilizando puertos (interfaces) y adaptadores para interactuar con la 
+* infraestructura. Las diferentes capas se comunican mediante interfaces, garantizando la inversión de dependencias y 
+* una estructura modular.
 *
-* Las diferentes capas se comunican mediante interfaces (el controlador con el servicio, con el adaptador, etc), garantizando
-* la inversión de dependencias y una estructura modular y desacoplada. 
+* Los DTOs (`ConversionRequest`, `ConversionResponse`) y las excepciones (CurrencyNotFoundException, ExternalApiException, 
+* GlobalExceptionHandler) se encuentran en sus capas correspondientes (presentación e infraestructura), manteniendo la 
+* separación de responsabilidades.
 *
-* Los DTOs (ConversionRequest, ConversionResponse) y las excepciones (CurrencyNotFoundException, ExternalApiException, 
-* GlobalExceptionHandler) se manejan en sus capas correspondientes (presentación e infraestructura, respectivamente), 
-* manteniendo la separación de responsabilidades.
-*
-* Con esta estructura es viable realizar una adaptación a un sistema con unas reglas negocio aplicables cuando el proyecto
-* evolucione y se añaden funcionalidades como gestión de usuarios y perfiles, historiales de conversiones, reglas de negocio 
-* complejas (por ej, límites de conversión, comisiones dinámicas, integración con sistemas contables, etc), o múltiples 
-* fuentes de datos que necesiten ser consolidadas o validadas de forma compleja.
-*
+* Esta estructura facilita la adaptación del sistema a futuras reglas de negocio o funcionalidades complejas, como 
+* gestión de usuarios, historiales de conversiones, comisiones dinámicas, o integración con múltiples fuentes de datos.
 * 
 * **Patrones de Diseño Clave:**
     * **Strategy Pattern:** 
@@ -109,8 +113,10 @@ de presentación se vea afectada por el rendimiento del sistema de notificacione
     * `ExchangeRateApiAdapter` y `InMemoryExchangeRateCacheAdapter` actúan como adaptadores para los puertos de salida.
     * **Builder Pattern:** 
     * Utilizado en `ConversionResponse` DTO para una construcción de objetos más legible y flexible.
-* **Manejo de Precisión de Dinero (`BigDecimal`):** 
-* Se utiliza `BigDecimal` para todas las operaciones monetarias y tasas de cambio para evitar problemas de precisión inherentes a `Double` o `Float`, asegurando cálculos financieros exactos.
+* **Manejo de Precisión Financiera (`BigDecimal`):** 
+* Se utiliza `BigDecimal` para todas las operaciones monetarias y tasas de cambio. Esta decisión es crítica para evitar 
+* problemas de precisión inherentes a `Double` o `Float`, garantizando la exactitud requerida en  cálculos financieros 
+* exactos.
 * **Métricas y Observabilidad (`Micrometer`):** 
 * Implementación de contadores de éxitos/fallos y un temporizador para la duración de las conversiones, esencial para monitorear la salud y el rendimiento en producción.
 * **Manejo de Errores y Notificaciones:**
@@ -121,13 +127,14 @@ de presentación se vea afectada por el rendimiento del sistema de notificacione
 * **Contenedorización (`Docker`):** 
 * Provisión de un `Dockerfile` para empaquetar la aplicación y sus dependencias, facilitando el despliegue consistente en cualquier entorno.
 * **Gestión de Perfiles (`Spring Profiles`):** 
-* Uso de `application-prod.properties` para definir configuraciones específicas de entorno de producción, como niveles de log y URLs de API, separando así las configuraciones de desarrollo y producción.
+* EL uso de `application-prod.properties` para definir configuraciones específicas de producción, como niveles de log y URLs de API, demostrando así una práctica estándar para gestionar entornos, separando eficientemente las configuraciones de desarrollo y producción.
 * **Dependencias de Spring:** 
-* Se emplea `RestTemplate` para llamadas HTTP, `@Value` para inyección de propiedades, `@Service`, `@Component`, `@RestController`, `@Autowired` (o inyección por constructor).
+* Se hace uso estratégico de componentes clave de Spring como `RestTemplate` para llamadas HTTP externas, `@Value` para inyección de propiedades, y anotaciones como `@Service`, `@Component`, `@RestController`, `@Autowired` (o inyección por constructor) para una gestión
+* eficiente de la inversión de control y las dependencias. 
 
 ### 4. Tecnologías Utilizadas
-* Se elige como framework principal Spring Boot por su agilidad en el desarrollo de microservicios, madurez en el ecosistema, facilidad 
-* para implementar patrones y soporte robusto para las pruebas y observabilidad. 
+* Se elige Spring Boot como framework principal por su agilidad en el desarrollo de microservicios, la madurez de su ecosistema,
+* facilidad para implementar patrones de diseño y soporte robusto para pruebas y observabilidad. 
 *  
 * **Tech Stack** 
 * Java 17
@@ -148,20 +155,26 @@ de presentación se vea afectada por el rendimiento del sistema de notificacione
 ### 6. Cómo Compilar y Ejecutar
 
 #### Localmente
-1.  Clona el repositorio: `git clone [URL_REPOSITORIO]`
-2.  Navega al directorio del proyecto: `cd currency-converter`
+1.  Clonar el repositorio: `git clone [URL_REPOSITORIO]`
+2.  Navegar al directorio del proyecto: `cd currency-converter`
 3.  Compila el proyecto: `mvn clean install`
-4.  Ejecuta la aplicación: `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar`
-    * Para ejecutar con perfil de producción: `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod`
+4.  HTTP (puerto 8080): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar`
+    HTTPS (puerto 8443): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar` (se ejecutará automáticamente en HTTPS si está configurado el puerto 8443 en application.properties).
+    Para ejecutar con perfil de producción: `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod`
 
 #### Con Docker
-1.  Asegurar tener Docker instalado y ejecutándose.
+1.  Tener Docker instalado y ejecutándose.
 2.  Navega al directorio raíz del proyecto.
 3.  Construye la imagen Docker: `docker build -t currency-converter-app .`
-4.  Ejecuta el contenedor: `docker run -p 8080:8080 currency-converter-app`
-    * Para ejecutar con perfil de producción: `docker run -p 8080:8080 -e "SPRING_PROFILES_ACTIVE=prod" currency-converter-app`
-      La aplicación estará disponible en `http://localhost:8080`.
-
+4.  Ejecuta el contenedor: `docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest`
+    * Para ejecutar con **perfil de producción y pasar la clave API como variable de entorno (usando HTTPS por defecto):**
+        ```bash
+        docker run -p 8443:8443 \
+            -e "SPRING_PROFILES_ACTIVE=prod" \
+            -e "EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774" \
+            currency-converter-app
+        ```
+      La aplicación estará disponible en `http://localhost:8080` según la configuración y el perfil activo.
 ### 7. Endpoints de la API
 * **POST /api/v1/convert**
     * **Descripción:** Convierte un monto de una divisa origen a una divisa destino.
@@ -204,11 +217,31 @@ de presentación se vea afectada por el rendimiento del sistema de notificacione
         ```
 
 ### 8. Pruebas
-Ejecuta las pruebas unitarias y de integración con Maven:
-`mvn test`
+* Ejecuta las pruebas unitarias y de integración con Maven:
+`mvn test` o `mvn clean test jacoco:report` para revisión de cobertura de código.
 
 ### 9. Próximos Pasos / Mejoras Potenciales
-Ideas futuras para considerar para el crecimiento del proyecto.
+* Este proyecto ha establecido una base sólida para futuras mejoras y expansiones:
+* 
+* Persistencia de Tasas de Cambio: Integrar una base de datos (SQL o NoSQL) para almacenar y cachear tasas de cambio a 
+* largo plazo.
+* 
+* Múltiples Proveedores de Tasas de Cambio: Implementar más adaptadores para diferentes APIs de tasas de cambio,
+* añadiendo lógica de fallback robusta. 
+* 
+* Límites de Cuota y Control de Flujo: Implementar mecanismos para gestionar límites de llamadas a APIs externas. 
+* 
+* Autenticación y Autorización: Añadir seguridad a los endpoints de la API (ej., OAuth2, JWT). 
+* Integración con Kafka/RabbitMQ: Utilizar un sistema de mensajería para notificaciones asíncronas o procesamiento 
+* de transacciones. 
+* 
+* Alertas a Herramientas de Monitoreo: Integrar las métricas de Micrometer con Prometheus y Grafana para un monitoreo 
+* y visualización más avanzados. 
+* 
+* Despliegue Continuo (CI/CD): Configurar pipelines de CI/CD (ej., Jenkins, GitHub Actions) para automatizar pruebas 
+* y despliegues. 
+* 
+* Documentación de API: Generar documentación de la API automáticamente con OpenAPI/Swagger.
 
 ### 10. Contacto
 Oscar Daniel Guzmán Neira - https://www.linkedin.com/in/oscar-daniel-guzman/
