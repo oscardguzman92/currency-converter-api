@@ -1,5 +1,6 @@
 package com.mycompany.currency.converter.Presentation.controllers;
 
+import com.mycompany.currency.converter.Application.ports.input.CurrencyConversionUseCase;
 import com.mycompany.currency.converter.Application.service.CurrencyConversionService;
 import com.mycompany.currency.converter.Infrastructure.exception.CurrencyNotFoundException;
 import com.mycompany.currency.converter.Presentation.DTO.ConversionRequest;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/convert")
 public class CurrencyConversionController {
     private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionController.class);
-    private final CurrencyConversionService conversionService;
+    private final CurrencyConversionUseCase conversionService;
 
-    public CurrencyConversionController(CurrencyConversionService conversionService) {
+    public CurrencyConversionController(CurrencyConversionUseCase conversionService) {
         this.conversionService = conversionService;
     }
 

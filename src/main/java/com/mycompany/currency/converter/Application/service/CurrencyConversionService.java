@@ -1,5 +1,6 @@
 package com.mycompany.currency.converter.Application.service;
 
+import com.mycompany.currency.converter.Application.ports.input.CurrencyConversionUseCase;
 import com.mycompany.currency.converter.Application.ports.out.ExchangeRateProviderStrategy;
 import com.mycompany.currency.converter.Infrastructure.exception.CurrencyNotFoundException;
 import com.mycompany.currency.converter.Presentation.DTO.ConversionResponse;
@@ -20,7 +21,7 @@ import io.micrometer.core.instrument.Timer;
 
 
 @Service
-public class CurrencyConversionService {
+public class CurrencyConversionService implements CurrencyConversionUseCase {
     private static final Logger logger = LoggerFactory.getLogger(CurrencyConversionService.class);
     private static final String BASE_CURRENCY_FOR_API = "EUR";
 
@@ -48,6 +49,7 @@ public class CurrencyConversionService {
                 .register(meterRegistry);
     }
 
+    @Override
     public ConversionResponse convertCurrency(BigDecimal amount, String sourceCurrency, String targetCurrency) throws CurrencyNotFoundException {
     long startTime = System.nanoTime();
         try {
