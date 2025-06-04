@@ -72,7 +72,8 @@ un entorno de negocio real.
  Para las pruebas unitarias, se utiliza SimpleMeterRegistry, una implementación ligera que no requiere un servidor Prometheus real.
  
 * Comunicación Segura (HTTPS): 
- La aplicación está configurada para servir la API a través de HTTPS, utilizando un certificado auto-firmado, lo que 
+ La aplicación está configurada para servir la API a través de HTTPS de forma externa (gestionado por servicios cloud 
+como AWS App Runner) o localmente a través del perfil `local-https`, utilizando un certificado auto-firmado, lo que 
  demuestra la preocupación por la seguridad en la comunicación. La contraseña de server.ssl.key-store-password que se 
  tiene en application.prod.properties idealmente en producción debería ser una variable de entorno o gestionada por un 
  sistema de secretos, no hardcodeada. Por ejemplo: server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}.
@@ -128,8 +129,12 @@ una estructura modular.
     * `NotificationService` con un adaptador de log (`LoggingNotificationAdapter`) y un mecanismo de `cooldown` para evitar la saturación de alertas, crucial para operaciones. Las notificaciones son asíncronas para no bloquear la ejecución principal.
 * **Contenedorización (`Docker`):** 
 Provisión de un `Dockerfile` para empaquetar la aplicación y sus dependencias, facilitando el despliegue consistente en cualquier entorno.
-* **Gestión de Perfiles (`Spring Profiles`):** 
-EL uso de `application-prod.properties` para definir configuraciones específicas de producción, como niveles de log y URLs de API, demostrando así una práctica estándar para gestionar entornos, separando eficientemente las configuraciones de desarrollo y producción.
+* **Gestión de Perfiles (`Spring Profiles`):**
+  El uso de **múltiples perfiles de Spring Boot** (`default`, `local-https`, `prod`) para definir configuraciones específicas para cada entorno de ejecución:
+    * **`default`**: Para desarrollo local (HTTP).
+    * **`local-https`**: Para pruebas locales con HTTPS habilitado.
+    * **`prod`**: Optimizado para despliegues en la nube (como AWS App Runner), donde la aplicación escucha HTTP internamente y el servicio cloud maneja la terminación HTTPS externa.
+      Esto demuestra una práctica estándar para gestionar entornos, separando eficientemente las configuraciones.
 * **Dependencias de Spring:** 
 Se hace uso estratégico de componentes clave de Spring como `RestTemplate` para llamadas HTTP externas, `@Value` para inyección de propiedades, y anotaciones como `@Service`, `@Component`, `@RestController`, `@Autowired` (o inyección por constructor) para una gestión
 eficiente de la inversión de control y las dependencias. 
@@ -164,20 +169,31 @@ eficiente de la inversión de control y las dependencias.
 
     * **Windows (Command Prompt):**
       ```cmd
-      set EXCHANGE_RATES_API_KEY="10124780aa73c83cd1e5b667cf8af774"
+      set EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774
       ```
     * **Linux/macOS (Bash/Zsh):**
       ```bash
-      export EXCHANGE_RATES_API_KEY="10124780aa73c83cd1e5b667cf8af774"
+      export EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774
       ```
       *(Este paso es necesario para que la aplicación pueda acceder a la API externa.)*
-5. HTTP (puerto 8080): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar`
-    HTTPS (puerto 8443): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar` (se ejecutará automáticamente en HTTPS si está configurado el puerto 8443 en application.properties).
-    Para ejecutar con perfil de producción: `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod`
+5. **Ejecutar la aplicación con el perfil deseado:**
+* **Para desarrollo local (HTTP en puerto 8080 - perfil `default`):**
+  ```bash
+  java -jar target/currency-converter-0.0.1-SNAPSHOT.jar
+  ```
+  La aplicación estará disponible en `http://localhost:8080`.
+
+    * **Para pruebas locales con HTTPS (puerto 8443 - perfil `local-https`):**
+        ```bash
+        java -jar target/currency-converter-0.0.1-SNAPSHOT.jar --spring.profiles.active=local-https
+        ```
+      La aplicación estará disponible en `https://localhost:8443`.
+
+    * **Nota:** El perfil `prod` está optimizado para despliegues en la nube y se ejecuta con HTTP internamente.
 
 #### Con Docker
 1.  Tener Docker instalado y ejecutándose.
-2.  Navega al directorio raíz del proyecto.
+2.  Navegar al directorio raíz del proyecto.
 3.  Construye la imagen Docker: `docker build -t my-currency-converter:latest .`
 4.  Ejecuta el contenedor: `docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest`
     * Para ejecutar con **perfil de producción y pasar la clave API como variable de entorno (usando HTTPS por defecto):**
