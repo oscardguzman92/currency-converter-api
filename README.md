@@ -196,16 +196,29 @@ eficiente de la inversión de control y las dependencias.
 2.  Navegar al directorio raíz del proyecto.
 3.  Construye la imagen Docker: `docker build -t my-currency-converter:latest .`
 4.  Ejecuta el contenedor: `docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest`
-    * Para ejecutar con **perfil de producción y pasar la clave API como variable de entorno (usando HTTPS por defecto):**
+    * **Para desarrollo local (HTTP en puerto 8080 - perfil `default`):**
         ```bash
-        docker run -p 8443:8443 -e SPRING_PROFILES_ACTIVE=prod -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter
+        docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY="TU_CLAVE_API" my-currency-converter:latest
         ```
-      La aplicación estará disponible en `http://localhost:8080` según la configuración y el perfil activo.
+      La aplicación estará disponible en `http://localhost:8080`.
 
-**Nota Importante (Modo Demostración):** Para facilitar la evaluación "plug-and-play" de este proyecto, los ejemplos 
-de `docker run` incluyen la clave API y la contraseña SSL directamente. En un entorno de producción real, **nunca** se 
-deben hardcodear claves API ni contraseñas. En su lugar, se deben utilizar servicios de gestión de secretos (como AWS 
-Secrets Manager, Azure Key Vault, etc.) para inyectar esta información de forma segura en tiempo de ejecución.
+    * **Para pruebas locales con HTTPS (puerto 8443 - perfil `local-https`):**
+        ```bash
+        docker run -p 8443:8443 -e SPRING_PROFILES_ACTIVE=local-https -e EXCHANGE_RATES_API_KEY="TU_CLAVE_API" my-currency-converter:latest
+        ```
+      La aplicación estará disponible en `https://localhost:8443`.
+
+    * **Para simular el perfil de producción en la nube (HTTP en puerto 8080 - perfil `prod`):**
+        ```bash
+        docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod -e EXCHANGE_RATES_API_KEY="TU_CLAVE_API" my-currency-converter:latest
+        ```
+      La aplicación estará disponible en `http://localhost:8080`. (Esto simula el comportamiento interno del contenedor en App Runner).
+
+**Nota Importante (Modo Demostración):** 
+Para facilitar la evaluación "plug-and-play" de este proyecto, los ejemplos de `docker run` y el perfil `local-https` 
+incluyen la clave API y la contraseña SSL (en el `keystore.p12`) directamente. En un entorno de producción real, 
+**nunca** se deben hardcodear claves API ni contraseñas. En su lugar, se deben utilizar servicios de gestión de secretos
+(como AWS Secrets Manager, Azure Key Vault, etc.) para inyectar esta información de forma segura en tiempo de ejecución.
 
 
 ### 7.** Endpoints de la API**
