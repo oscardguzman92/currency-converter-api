@@ -73,7 +73,9 @@ un entorno de negocio real.
 * 
 * Comunicación Segura (HTTPS): 
 * La aplicación está configurada para servir la API a través de HTTPS, utilizando un certificado auto-firmado, lo que 
-* demuestra la preocupación por la seguridad en la comunicación.
+* demuestra la preocupación por la seguridad en la comunicación. La contraseña de server.ssl.key-store-password que se 
+* tiene en application.prod.properties idealmente en producción debería ser una variable de entorno o gestionada por un 
+* sistema de secretos, no hardcodeada. Por ejemplo: server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}.
 * 
 * Monitoreo y Operaciones con Spring Boot Actuator: 
 * Se exponen los endpoints health e info de Spring Boot Actuator, esenciales para verificar el estado de la aplicación, 
@@ -157,8 +159,19 @@ un entorno de negocio real.
 #### Localmente
 1.  Clonar el repositorio: `git clone [URL_REPOSITORIO]`
 2.  Navegar al directorio del proyecto: `cd currency-converter`
-3.  Compila el proyecto: `mvn clean install`
-4.  HTTP (puerto 8080): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar`
+3.  Compilar el proyecto: `mvn clean install`
+4. **Configurar la variable de entorno `EXCHANGE_RATES_API_KEY`:**
+
+    * **Windows (Command Prompt):**
+      ```cmd
+      set EXCHANGE_RATES_API_KEY="10124780aa73c83cd1e5b667cf8af774"
+      ```
+    * **Linux/macOS (Bash/Zsh):**
+      ```bash
+      export EXCHANGE_RATES_API_KEY="10124780aa73c83cd1e5b667cf8af774"
+      ```
+      *(Este paso es necesario para que la aplicación pueda acceder a la API externa.)*
+5. HTTP (puerto 8080): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar`
     HTTPS (puerto 8443): `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar` (se ejecutará automáticamente en HTTPS si está configurado el puerto 8443 en application.properties).
     Para ejecutar con perfil de producción: `java -jar target/currency-converter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod`
 
