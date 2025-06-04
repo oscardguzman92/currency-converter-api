@@ -19,7 +19,7 @@ un entorno de negocio real.
 
 ---
 
-### 1.** Descripción General**
+### 1. Descripción General
  Este proyecto tiene como propósito realizar una API de conversión de monedas.
  Su funcionalidad principal radica en la consulta y procesamiento de tasas de 
  cambio obtenidas de una API externa (Exchange Rates API), que utiliza el Euro  (EUR),
@@ -28,7 +28,7 @@ un entorno de negocio real.
  escalable,mantenible, adaptable y resiliente frente a cambios y errores, lo que la hace ideal
  para replicar en un dominio de negocio real. 
 
-### 2.** Características**
+### 2. Características
 * **Conversión de divisas (Origen -> EUR -> Destino):**
   La lógica de conversión se gestiona explícitamente en dos fases (de la moneda origen a EUR, y de EUR a la moneda 
  destino), optimizando el uso de la API externa que solo proporciona tasas relativas al Euro.
@@ -93,7 +93,7 @@ como AWS App Runner) o localmente a través del perfil `local-https`, utilizando
  De esta forma mantenemos los secrets y la información sensible fuera de git y de ser hardcodeado en el código y los 
  archivos de configuración. 
 
-### 3.** Decisiones de Diseño y Arquitectura**
+### 3. Decisiones de Diseño y Arquitectura
 
 * **Arquitectura:** 
 Se optó por esta arquitectura para lograr una separación clara de preocupaciones (Application, Infrastructure, 
@@ -144,7 +144,7 @@ Provisión de un `Dockerfile` para empaquetar la aplicación y sus dependencias,
 Se hace uso estratégico de componentes clave de Spring como `RestTemplate` para llamadas HTTP externas, `@Value` para inyección de propiedades, y anotaciones como `@Service`, `@Component`, `@RestController`, `@Autowired` (o inyección por constructor) para una gestión
 eficiente de la inversión de control y las dependencias. 
 
-### 4.** Tecnologías Utilizadas**
+### 4. Tecnologías Utilizadas
 * Se elige Spring Boot como framework principal por su agilidad en el desarrollo de microservicios, la madurez de su ecosistema,
 * facilidad para implementar patrones de diseño y soporte robusto para pruebas y observabilidad. 
 *  
@@ -158,13 +158,13 @@ eficiente de la inversión de control y las dependencias.
 * Exchange Rates API (API externa de tasas de cambio)
 * Docker
 
-### 5.** Requisitos**
+### 5. Requisitos
 * JDK 17 o superior
 * Maven 3.6.x o superior
 * Docker (opcional, para ejecutar en contenedor)
 * Conexión a internet para la API externa.
 
-### 6.** Cómo Compilar y Ejecutar**
+### 6. Cómo Compilar y Ejecutar 
 
 #### Localmente
 1.  Clonar el repositorio: `git clone https://github.com/oscardguzman92/currency-converter-api`
@@ -226,7 +226,7 @@ incluyen la clave API y la contraseña SSL (en el `keystore.p12`) directamente. 
 (como AWS Secrets Manager, Azure Key Vault, etc.) para inyectar esta información de forma segura en tiempo de ejecución.
 
 
-### 7.** Endpoints de la API**
+### 7. Endpoints de la API
 * **POST /api/v1/convert**
     * **Descripción:** Convierte un monto de una divisa origen a una divisa destino.
     * **Body (JSON):**
@@ -267,7 +267,7 @@ incluyen la clave API y la contraseña SSL (en el `keystore.p12`) directamente. 
         }
         ```
 
-### 8.** Pruebas**
+### 8. Pruebas
 * Ejecuta las pruebas unitarias y de integración con Maven:
 `mvn test` o `mvn clean test jacoco:report` para revisión de cobertura de código.
 
@@ -321,5 +321,5 @@ y despliegues.
  
 * **Documentación de API:** Generar documentación de la API automáticamente con OpenAPI/Swagger.
 
-### 11.** Contacto**
+### 11. Contacto
 Oscar Daniel Guzmán Neira - https://www.linkedin.com/in/oscar-daniel-guzman/
