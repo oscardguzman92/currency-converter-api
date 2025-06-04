@@ -178,14 +178,11 @@ un entorno de negocio real.
 #### Con Docker
 1.  Tener Docker instalado y ejecutándose.
 2.  Navega al directorio raíz del proyecto.
-3.  Construye la imagen Docker: `docker build -t currency-converter-app .`
+3.  Construye la imagen Docker: `docker build -t my-currency-converter:latest .`
 4.  Ejecuta el contenedor: `docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest`
     * Para ejecutar con **perfil de producción y pasar la clave API como variable de entorno (usando HTTPS por defecto):**
         ```bash
-        docker run -p 8443:8443 \
-            -e "SPRING_PROFILES_ACTIVE=prod" \
-            -e "EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774" \
-            currency-converter-app
+        docker run -p 8443:8443 -e SPRING_PROFILES_ACTIVE=prod -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter
         ```
       La aplicación estará disponible en `http://localhost:8080` según la configuración y el perfil activo.
 ### 7. Endpoints de la API
