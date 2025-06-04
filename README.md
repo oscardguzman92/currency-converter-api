@@ -157,7 +157,7 @@ eficiente de la inversión de control y las dependencias.
 ### 6. Cómo Compilar y Ejecutar
 
 #### Localmente
-1.  Clonar el repositorio: `git clone [URL_REPOSITORIO]`
+1.  Clonar el repositorio: `git clone https://github.com/oscardguzman92/currency-converter-api`
 2.  Navegar al directorio del proyecto: `cd currency-converter`
 3.  Compilar el proyecto: `mvn clean install`
 4. **Configurar la variable de entorno `EXCHANGE_RATES_API_KEY`:**
@@ -185,6 +185,13 @@ eficiente de la inversión de control y las dependencias.
         docker run -p 8443:8443 -e SPRING_PROFILES_ACTIVE=prod -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter
         ```
       La aplicación estará disponible en `http://localhost:8080` según la configuración y el perfil activo.
+
+**Nota Importante (Modo Demostración):** Para facilitar la evaluación "plug-and-play" de este proyecto, los ejemplos 
+de `docker run` incluyen la clave API y la contraseña SSL directamente. En un entorno de producción real, **nunca** se 
+deben hardcodear claves API ni contraseñas. En su lugar, se deben utilizar servicios de gestión de secretos (como AWS 
+Secrets Manager, Azure Key Vault, etc.) para inyectar esta información de forma segura en tiempo de ejecución.
+
+
 ### 7. Endpoints de la API
 * **POST /api/v1/convert**
     * **Descripción:** Convierte un monto de una divisa origen a una divisa destino.
