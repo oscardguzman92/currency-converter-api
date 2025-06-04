@@ -14,8 +14,9 @@ un entorno de negocio real.
     * [Con Docker](#con-docker)
 7.  [Endpoints de la API](#7-endpoints-de-la-api)
 8.  [Pruebas](#8-pruebas)
-9.  [Próximos Pasos / Mejoras Potenciales](#9-próximos-pasos--mejoras-potenciales)
-10. [Contacto](#10-contacto)
+9.  [Despliegue en la Nube (AWS)](#9-despliegue-en-la-nube-aws)
+10. [Próximos Pasos / Mejoras Potenciales](#9-próximos-pasos--mejoras-potenciales)
+11. [Contacto](#10-contacto)
 
 ---
 
@@ -33,7 +34,7 @@ un entorno de negocio real.
   La lógica de conversión se gestiona explícitamente en dos fases (de la moneda origen a EUR, y de EUR a la moneda 
  destino), optimizando el uso de la API externa que solo proporciona tasas relativas al Euro.
 
-**Integración con API externa de tasas de cambio:**
+* **Integración con API externa de tasas de cambio:**
  Realizar una integración robusta con la API externa de Exchange Rates para obtener las tasas de cambio actualizadas, 
  que son la base para todos los cálculos de conversión. 
  
@@ -102,12 +103,12 @@ actúa como el orquestador principal, utilizando puertos (interfaces) y adaptado
 infraestructura. Las diferentes capas se comunican mediante interfaces, garantizando la inversión de dependencias y 
 una estructura modular.
 
-* Los DTOs (`ConversionRequest`, `ConversionResponse`) y las excepciones (CurrencyNotFoundException, ExternalApiException, 
-* GlobalExceptionHandler) se encuentran en sus capas correspondientes (presentación e infraestructura), manteniendo la 
-* separación de responsabilidades.
+Los DTOs (`ConversionRequest`, `ConversionResponse`) y las excepciones (CurrencyNotFoundException, ExternalApiException, 
+ GlobalExceptionHandler) se encuentran en sus capas correspondientes (presentación e infraestructura), manteniendo la 
+ separación de responsabilidades.
 
-* Esta estructura facilita la adaptación del sistema a futuras reglas de negocio o funcionalidades complejas, como 
-* gestión de usuarios, historiales de conversiones, comisiones dinámicas, o integración con múltiples fuentes de datos.
+ Esta estructura facilita la adaptación del sistema a futuras reglas de negocio o funcionalidades complejas, como 
+ gestión de usuarios, historiales de conversiones, comisiones dinámicas, o integración con múltiples fuentes de datos.
  
 * **Patrones de Diseño Clave:**
     * **Strategy Pattern:** 
@@ -181,6 +182,7 @@ eficiente de la inversión de control y las dependencias.
       export EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774
       ```
       *(Este paso es necesario para que la aplicación pueda acceder a la API externa.)*
+   
 5. **Ejecutar la aplicación con el perfil deseado:**
 * **Para desarrollo local (HTTP en puerto 8080 - perfil `default`):**
   ```bash
