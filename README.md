@@ -19,7 +19,7 @@ un entorno de negocio real.
 
 ---
 
-### 1. Descripción General
+### 1.** Descripción General**
  Este proyecto tiene como propósito realizar una API de conversión de monedas.
  Su funcionalidad principal radica en la consulta y procesamiento de tasas de 
  cambio obtenidas de una API externa (Exchange Rates API), que utiliza el Euro  (EUR),
@@ -28,7 +28,7 @@ un entorno de negocio real.
  escalable,mantenible, adaptable y resiliente frente a cambios y errores, lo que la hace ideal
  para replicar en un dominio de negocio real. 
 
-### 2. Características
+### 2.** Características**
 * Conversión de divisas (Origen -> EUR -> Destino):
   La lógica de conversión se gestiona explícitamente en dos fases (de la moneda origen a EUR, y de EUR a la moneda 
  destino), optimizando el uso de la API externa que solo proporciona tasas relativas al Euro.
@@ -93,7 +93,7 @@ como AWS App Runner) o localmente a través del perfil `local-https`, utilizando
  De esta forma mantenemos los secrets y la información sensible fuera de git y de ser hardcodeado en el código y los 
  archivos de configuración. 
 
-### 3. Decisiones de Diseño y Arquitectura
+### 3.** Decisiones de Diseño y Arquitectura**
 
 * **Arquitectura:** 
 Se optó por esta arquitectura para lograr una separación clara de preocupaciones (Application, Infrastructure, 
@@ -139,7 +139,7 @@ Provisión de un `Dockerfile` para empaquetar la aplicación y sus dependencias,
 Se hace uso estratégico de componentes clave de Spring como `RestTemplate` para llamadas HTTP externas, `@Value` para inyección de propiedades, y anotaciones como `@Service`, `@Component`, `@RestController`, `@Autowired` (o inyección por constructor) para una gestión
 eficiente de la inversión de control y las dependencias. 
 
-### 4. Tecnologías Utilizadas
+### 4.** Tecnologías Utilizadas**
 * Se elige Spring Boot como framework principal por su agilidad en el desarrollo de microservicios, la madurez de su ecosistema,
 * facilidad para implementar patrones de diseño y soporte robusto para pruebas y observabilidad. 
 *  
@@ -153,13 +153,13 @@ eficiente de la inversión de control y las dependencias.
 * Exchange Rates API (API externa de tasas de cambio)
 * Docker
 
-### 5. Requisitos
+### 5.** Requisitos**
 * JDK 17 o superior
 * Maven 3.6.x o superior
 * Docker (opcional, para ejecutar en contenedor)
 * Conexión a internet para la API externa.
 
-### 6. Cómo Compilar y Ejecutar
+### 6.** Cómo Compilar y Ejecutar**
 
 #### Localmente
 1.  Clonar el repositorio: `git clone https://github.com/oscardguzman92/currency-converter-api`
@@ -208,7 +208,7 @@ deben hardcodear claves API ni contraseñas. En su lugar, se deben utilizar serv
 Secrets Manager, Azure Key Vault, etc.) para inyectar esta información de forma segura en tiempo de ejecución.
 
 
-### 7. Endpoints de la API
+### 7.** Endpoints de la API**
 * **POST /api/v1/convert**
     * **Descripción:** Convierte un monto de una divisa origen a una divisa destino.
     * **Body (JSON):**
@@ -249,11 +249,37 @@ Secrets Manager, Azure Key Vault, etc.) para inyectar esta información de forma
         }
         ```
 
-### 8. Pruebas
+### 8.** Pruebas**
 * Ejecuta las pruebas unitarias y de integración con Maven:
 `mvn test` o `mvn clean test jacoco:report` para revisión de cobertura de código.
 
-### 9. Próximos Pasos / Mejoras Potenciales
+### 9.** Despliegue en la Nube (AWS)**
+
+Para demostrar la capacidad de llevar este proyecto a un entorno accesible públicamente y showcasing habilidades de 
+despliegue en la nube, la aplicación ha sido desplegada en **Amazon Web Services (AWS)**.
+
+* **Servicios de AWS Utilizados:**
+    * **AWS App Runner:** Un servicio de contenedores completamente administrado que facilita el despliegue de 
+  aplicaciones web y APIs sin necesidad de gestionar servidores, balanceadores de carga o configuraciones de 
+  escalado complejas. Se encarga automáticamente del aprovisionamiento, despliegue, escalado y gestión de HTTPS.
+    * **AWS Elastic Container Registry (ECR):** Un registro de imágenes Docker seguro y escalable utilizado para 
+  almacenar la imagen Docker de la aplicación.
+
+* **Estrategia de Despliegue:**
+  La imagen Docker de la aplicación (`my-currency-converter`) se almacena en AWS ECR. Posteriormente, AWS App Runner la 
+toma de ECR, inyecta las variables de entorno necesarias (como `EXCHANGE_RATES_API_KEY` y `SPRING_PROFILES_ACTIVE=prod`) y la despliega, exponiéndola públicamente con HTTPS automático.
+
+* **Aplicación Desplegada (URL Pública):**
+  Puedes acceder y probar la API directamente a través de la siguiente URL (este es un ejemplo de mi despliegue):
+  `curl --location 'https://ntiqfb7id3.us-east-1.awsapprunner.com/api/v1/convert' \
+  --header 'Content-Type: application/json' \
+  --data '{
+  "amount": 100.00,
+  "sourceCurrency": "USD",
+  "targetCurrency": "GBP"
+  }'`
+
+### 10.** Próximos Pasos / Mejoras Potenciales**
 * Este proyecto ha establecido una base sólida para futuras mejoras y expansiones:
  
  Persistencia de Tasas de Cambio: Integrar una base de datos (SQL o NoSQL) para almacenar y cachear tasas de cambio a 
@@ -276,5 +302,5 @@ y despliegues.
  
 * Documentación de API: Generar documentación de la API automáticamente con OpenAPI/Swagger.
 
-### 10. Contacto
+### 11.** Contacto**
 Oscar Daniel Guzmán Neira - https://www.linkedin.com/in/oscar-daniel-guzman/
