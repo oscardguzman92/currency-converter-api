@@ -15,8 +15,8 @@ un entorno de negocio real.
 7.  [Endpoints de la API](#7-endpoints-de-la-api)
 8.  [Pruebas](#8-pruebas)
 9.  [Despliegue en la Nube (AWS)](#9-despliegue-en-la-nube-aws)
-10. [Próximos Pasos / Mejoras Potenciales](#9-próximos-pasos--mejoras-potenciales)
-11. [Contacto](#10-contacto)
+10. [Próximos Pasos / Mejoras Potenciales](#10-próximos-pasos--mejoras-potenciales)
+11. [Contacto](#11-contacto)
 
 ---
 
