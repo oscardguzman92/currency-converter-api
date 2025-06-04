@@ -78,7 +78,7 @@ como AWS App Runner) o localmente a través del perfil `local-https`, utilizando
  tiene en application.prod.properties idealmente en producción debería ser una variable de entorno o gestionada por un 
  sistema de secretos, no hardcodeada. Por ejemplo: server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}.
  
- Monitoreo y Operaciones con Spring Boot Actuator: 
+ * **Monitoreo y Operaciones con Spring Boot Actuator:** 
  Se exponen los endpoints health e info de Spring Boot Actuator, esenciales para verificar el estado de la aplicación, 
  obtener metadatos y facilitar la integración con herramientas de monitoreo en entornos de producción.
  
@@ -89,7 +89,7 @@ como AWS App Runner) o localmente a través del perfil `local-https`, utilizando
  
  Dejamos el access key del API externa definido como variable de entorno, 
  y la seteamos desde el llamado de docker run:
- docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest
+ `docker run -p 8080:8080 -e EXCHANGE_RATES_API_KEY=10124780aa73c83cd1e5b667cf8af774 my-currency-converter:latest`
  De esta forma mantenemos los secrets y la información sensible fuera de git y de ser hardcodeado en el código y los 
  archivos de configuración. 
 
